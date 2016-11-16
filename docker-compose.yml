@@ -2,6 +2,7 @@ version: '2'
 
 services:
   elasticsearch:
+    image: "docker-registry.nimaws.com/devops/monitoring/elasticsearch:5"
     build: elasticsearch/
     ports:
       - "9200:9200"
@@ -9,25 +10,29 @@ services:
     environment:
       ES_JAVA_OPTS: "-Xms1g -Xmx1g"
     networks:
-      - docker_elk
+      - logging
+
   logstash:
+    image: "docker-registry.nimaws.com/devops/monitoring/logstash:5"
     build: logstash/
     command: -f /etc/logstash/conf.d/
     volumes:
-      - ./logstash/config:/etc/logstash/conf.d
+      - "./logstash/config:/etc/logstash/conf.d"
     ports:
       - "5000:5000"
     networks:
-      - docker_elk
+      - logging
+
   kibana:
+    image: "docker-registry.nimaws.com/devops/monitoring/kibana:5"
     build: kibana/
     volumes:
-      - ./kibana/config/:/opt/kibana/config/
+      - "./kibana/config/:/opt/kibana/config/"
     ports:
       - "5601:5601"
     networks:
-      - docker_elk
+      - logging
 
 networks:
-  docker_elk:
-    driver: bridge
+  logging:
+    external: true 
